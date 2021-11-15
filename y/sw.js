@@ -1,5 +1,5 @@
-const staticCacheName = 'site-static-v1';
-const dynamicCacheName = 'site-dynamic-v1';
+const staticCacheName = 'site-static-v2';
+const dynamicCacheName = 'site-dynamic-v3';
 const assets = [
     '/',
     '/index.html',
@@ -54,13 +54,16 @@ self.addEventListener('activate', event => {
 // Ftech event proxy
 self.addEventListener('fetch', event => {
     // console.log("Fetch events", event)
+    if (!event.request.url.indexOf('firestore.ggogleapis.com'))
+        return;
+
     event.respondWith(
         caches.match(event.request).then(cacheRes => {
 
             return cacheRes || fetch(event.request).then(fetchRes => {
                 return caches.open(dynamicCacheName).then(cache => {
                     cache.put(event.request.url, fetchRes.clone());
-                    limitCacheSize(dynamicCacheName, 2);
+                    limitCacheSize(dynamicCacheName, 15);
                     return fetchRes;
                 })
             });
